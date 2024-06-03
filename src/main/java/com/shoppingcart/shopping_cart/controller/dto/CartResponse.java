@@ -1,4 +1,4 @@
-package com.shoppingcart.shopping_cart.dto;
+package com.shoppingcart.shopping_cart.controller.dto;
 
 import com.shoppingcart.shopping_cart.domain.Cart;
 
