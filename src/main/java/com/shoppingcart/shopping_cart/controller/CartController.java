@@ -18,9 +18,9 @@ public class CartController {
         return ResponseEntity.ok(cartService.getBy(id));
     }
 
-    @PostMapping("/cart/{id}/addProducts")
-    public ResponseEntity<?> addProductsToCart(@PathVariable Long id, @RequestBody AddProductRequest request) {
-        return null;
+    @PostMapping("/cart/{cartId}")
+    public ResponseEntity<Void> addProductToCart(@PathVariable Long cartId, @RequestBody AddProductRequest addProductRequest) {
+        cartService.addProducts(cartId, addProductRequest.getProductIds());
+        return ResponseEntity.ok().build();
     }
-
 }

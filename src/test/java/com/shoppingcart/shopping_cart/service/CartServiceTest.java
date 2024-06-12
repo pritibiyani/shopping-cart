@@ -10,6 +10,9 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -35,5 +38,27 @@ class CartServiceTest {
     void shouldThrowExceptionWithInvalidCartId() {
         CartNotFoundException exception = assertThrows(CartNotFoundException.class, () -> cartService.getBy(1L));
         assertEquals("Cart with id 1 not found", exception.getMessage());
+    }
+
+
+    @Test
+    void shouldAddProductToValidCart() {
+        Cart cart = new Cart(1L);
+        long MOBILE_ID = 901L;
+        long CHARGER_ID = 902L;
+        Mockito.when(cartRepository.findById(1L)).thenReturn(Optional.of(cart));
+
+        cartService.addProducts(1L, List.of(MOBILE_ID, CHARGER_ID));
+
+        assertEquals(2, cart.size());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenAddingProductToInvalidCart() {
+        Long productId = 1L;
+
+        Mockito.when(cartRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(CartNotFoundException.class, () -> cartService.addProducts(1L, List.of(productId)));
     }
 }

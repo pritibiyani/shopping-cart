@@ -1,5 +1,7 @@
 package com.shoppingcart.shopping_cart.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.shoppingcart.shopping_cart.controller.dto.AddProductRequest;
 import com.shoppingcart.shopping_cart.domain.Cart;
 import com.shoppingcart.shopping_cart.domain.Product;
 import com.shoppingcart.shopping_cart.repository.CartRepository;
@@ -10,11 +12,12 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -23,6 +26,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 public class CartControllerTest {
 
+    public static final long MOBILE_ID = 901L;
+    public static final long CHARGER_ID = 902L;
     @Autowired
     private MockMvc mockMvc;
 
@@ -43,16 +48,24 @@ public class CartControllerTest {
 
 
     @Test
-    public void shouldAddProductsToCartAndReturnSuccess() throws Exception {
-        Product product1 = new Product(1L, "Test Product 1", 99.99);
-        Product product2 = new Product(2L, "Test Product 2", 99.99);
+    public void shouldAddProductToCartWithSuccess() throws Exception {
+        Cart savedCart = cartRepository.save(new Cart(345L));
+        Product product1 = new Product(MOBILE_ID, "Mobile Apple", 9000.0);
+        Product product2 = new Product(CHARGER_ID, "Type C Charger", 200.0);
 
         productRepository.saveAll(List.of(product1, product2));
-        cartRepository.save(new Cart(345L));
 
-        mockMvc.perform(post("/cart/345/")
+        AddProductRequest addProductRequest = new AddProductRequest(List.of(MOBILE_ID, CHARGER_ID));
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String requestBody = objectMapper.writeValueAsString(addProductRequest);
+
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/cart/" + savedCart.getId())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"productIds\":[1,2]}")) // Replace this with the actual request body
+                        .content(requestBody))
                 .andExpect(status().isOk());
+
+        assertEquals(2, cartRepository.findById(345L).get().size());
     }
 }
