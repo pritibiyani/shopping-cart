@@ -36,4 +36,20 @@ public class Cart {
     public void addProducts(List<Long> productIds) {
         this.productIds.addAll(productIds);
     }
+
+    public Double calculateTotal(List<Product> products) {
+        return productIds.stream()
+                .flatMap(id -> products.stream()
+                        .filter(product -> product.getId().equals(id))
+                        .map(Product::getPrice))
+                .reduce(0.0, Double::sum);
+    }
+
+    public boolean isEmpty() {
+        return productIds!=null && productIds.isEmpty();
+    }
+
+    public List<Long> getProductIds() {
+        return this.productIds;
+    }
 }

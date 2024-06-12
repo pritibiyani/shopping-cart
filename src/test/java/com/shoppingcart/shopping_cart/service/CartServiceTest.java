@@ -26,12 +26,25 @@ class CartServiceTest {
     private CartService cartService;
 
     @Test
-    void shouldReturnCartWithValidCartId() {
+    void shouldReturnEmptyCartWithValidCartId() {
         Mockito.when(cartRepository.findById(1L)).thenReturn(java.util.Optional.of(new Cart(1L)));
 
         CartResponse cartResponse = cartService.getBy(1L);
 
-        assertEquals(new CartResponse(1L), cartResponse);
+        assertEquals(new CartResponse(1L, 0.0, List.of()), cartResponse);
+    }
+
+    @Test
+    void shouldReturnCartWithValidCartId() {
+        Cart cart = new Cart(1L);
+        cart.addProducts(List.of(1L, 2L, 3L));
+
+        CartService cartService = Mockito.mock(CartService.class);
+        Mockito.when(cartService.getBy(1L)).thenReturn(new CartResponse(1L, 11500.00, List.of(1L, 2L, 3L)));
+
+        CartResponse cartResponse = cartService.getBy(1L);
+
+        assertEquals(new CartResponse(1L, 11500.0, List.of(1L, 2L, 3L)), cartResponse);
     }
 
     @Test
@@ -61,4 +74,5 @@ class CartServiceTest {
 
         assertThrows(CartNotFoundException.class, () -> cartService.addProducts(1L, List.of(productId)));
     }
+
 }

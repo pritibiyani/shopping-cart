@@ -19,4 +19,12 @@ public class Product {
     public Product() {
 
     }
+
+    public Long getId() {
+        return id;
+    }
+
+    public Double getPrice() {
+        return price;
+    }
 }
